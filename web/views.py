@@ -2,11 +2,12 @@ import string
 from json import JSONEncoder
 from random import random
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.crypto import get_random_string
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.models import  User
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from web.models import User, Token, Expense, Income , Passwordresetcodes
 from datetime import datetime
 
@@ -87,6 +88,29 @@ def register(request):
     else:
         context = {'message': ''}
         return render(request, 'register.html', context)
+        
+        
+@csrf_exempt
+@require_POST
+def login(request):
+    # check if POST objects has username and password
+    if 'username' and 'password' in request.POST:
+        username = request.POST['username']
+        password = request.POST['password']
+        this_user = get_object_or_404(User, username=username)
+        if (check_password(password, this_user.password)):  # authentication
+            this_token = get_object_or_404(Token, user=this_user)
+            token = this_token.token
+            context = {}
+            context['result'] = 'ok'
+            context['token'] = token
+            # return {'status':'ok','token':'TOKEN'}
+            return JsonResponse(context, encoder=JSONEncoder)
+        else:
+            context = {}
+            context['result'] = 'error'
+            # return {'status':'error'}
+            return JsonResponse(context, encoder=JSONEncoder)
 
 
 def index(request):
@@ -97,9 +121,7 @@ def index(request):
 @csrf_exempt
 def submit_expense(request):
     '''user submit a request an expense'''
-
     #TODO: validate date user may be fake, token may be fake, amount may be invalide
-
     this_token = request.GET['token']
     this_user= User.objects.filter(token__token = this_token ).get()
     print(request.GET)
@@ -113,7 +135,6 @@ def submit_expense(request):
 
 def submit_income(request):
     '''user submit a request an income'''
-
     #TODO: validate date user may be fake, token may be fake, amount may be invalide
     this_token = request.GET['token']
     this_user= User.objects.filter(token__token = this_token ).get()

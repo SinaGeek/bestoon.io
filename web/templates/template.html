@@ -51,9 +51,7 @@
                   <ul class="nav navbar-nav navbar-left">
                     {% if user.is_authenticated %}
                     <!--<li><a href="/static/todoer_release.apk">اپ اندروید</a></li>-->
-                    <li><a href="{% if 'accounts/logout' in urls %}
-                                    {% url 'accounts/logout' %}
-                                  {% endif %}">خروج</a></li>
+                    <a href="{% url 'logout' %}">خروج</a>
                     {% else %}
                     <li><a href="{% url 'index' %}"></a></li>
                     <li><a href="{% url 'accounts/register' %}">ثبت نام</a></li>

@@ -1,5 +1,6 @@
 import string
 from json import JSONEncoder
+from django.conf import settings
 from random import random
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render

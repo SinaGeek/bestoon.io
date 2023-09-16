@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from web.models import User, Token, Expense, Income , Passwordresetcodes
 from datetime import datetime
-
+from django.db.models import Sum,Count
 from .utils import grecaptcha_verify
 
 
@@ -117,6 +117,21 @@ def login(request):
 def index(request):
     context = {}
     return render(request, 'index.html', context)
+
+
+def generalstat(request):
+    #TODO: should get valid duraion from (date) to (date) if nor 1 mounth.
+    #TODO: Is the token valid!
+    
+    this_token = request.GET['token']
+    this_user= User.objects.filter(token__token = this_token ).get()
+
+    income = Income.objects.filter(user = this_user).aaggregate(Count('amount'), Sum('amount'))
+    expense = Expense.objects.filter(user = this_user).aaggregate(Count('amount'), Sum('amount'))
+    context ={}
+    context['expense'] = expense
+    context['income'] = income
+    return JsonResponse(context, encoder= JSONEncoder) 
 
 
 @csrf_exempt

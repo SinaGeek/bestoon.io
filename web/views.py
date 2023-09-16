@@ -123,11 +123,11 @@ def generalstat(request):
     #TODO: should get valid duraion from (date) to (date) if nor 1 mounth.
     #TODO: Is the token valid!
     
-    this_token = request.GET['token']
+    this_token = request.POST['token']
     this_user= User.objects.filter(token__token = this_token ).get()
-
-    income = Income.objects.filter(user = this_user).aaggregate(Count('amount'), Sum('amount'))
-    expense = Expense.objects.filter(user = this_user).aaggregate(Count('amount'), Sum('amount'))
+    print(request.GET)
+    income = Income.objects.filter(user = this_user).aggregate(Count('amount'), Sum('amount'))
+    expense = Expense.objects.filter(user = this_user).aggregate(Count('amount'), Sum('amount'))
     context ={}
     context['expense'] = expense
     context['income'] = income

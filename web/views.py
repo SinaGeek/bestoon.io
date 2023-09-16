@@ -118,7 +118,7 @@ def index(request):
     context = {}
     return render(request, 'index.html', context)
 
-
+@csrf_exempt
 def generalstat(request):
     #TODO: should get valid duraion from (date) to (date) if nor 1 mounth.
     #TODO: Is the token valid!
